@@ -1,0 +1,43 @@
+name: Build and Publish Android APP oOn
+on:
+  workflow_dispatch:  # 仅手动触发
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. 设置 JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'  # 使用 Azul Zulu JDK
+          java-version: '17'    # 使用 JDK 17
+
+      # 3. 设置 Android SDK
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+
+      # 4. 构建 APK 或 AAB
+      - name: Build APK
+        run: |
+          ./gradlew assembleRelease  # 构建 APK
+          # 如果需要构建 AAB，可以使用以下命令：
+          # ./gradlew bundleRelease
+
+      # 5. 上传构建结果作为工件
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release  # 工件名称
+          path: app/build/outputs/apk/release/app-release.apk  # APK 文件路径
+          # 如果是 AAB 文件，路径为：
+          # path: app/build/outputs/bundle/release/app-release.aab
+
+      # 6. 清理 Gradle 缓存（可选）
+      - name: Clean Gradle cache
+        run: |
+          ./gradlew clean
