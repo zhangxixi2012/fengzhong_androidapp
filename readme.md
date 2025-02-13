@@ -1,1 +1,1 @@
-a simple Android app
+A small software developed by Zhangxixi2012
